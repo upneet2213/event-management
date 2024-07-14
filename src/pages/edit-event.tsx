@@ -41,12 +41,20 @@ const FormSchema = z.object({
 });
 
 export default function AddEvent() {
+  const event1Date = new Date(2024, 6, 12); // July 12, 2024
+  const event2Date = new Date(2024, 6, 13); // July 13, 2024
+  const event: Event = {
+    eventFrom: event1Date,
+    eventTo: event2Date,
+    eventName: "My event",
+    eventType: "1",
+    id: "102",
+  };
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      eventName: "",
-    },
+    defaultValues: event,
   });
+  const errors = form.formState.errors;
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     // console.log(data);
@@ -70,7 +78,7 @@ export default function AddEvent() {
   return (
     <main className="min-h-screen p-24">
       <Form {...form}>
-        <h1 className="text-4xl mb-12">Add Event</h1>
+        <h1 className="text-4xl mb-12">Edit Event</h1>
         <form
           className={`flex flex-col items-center gap-12`}
           onSubmit={form.handleSubmit(onSubmit)}
