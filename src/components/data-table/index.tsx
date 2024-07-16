@@ -26,7 +26,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -36,7 +35,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Event } from "@/types";
-// import { getDateFormat } from "../../utils/date";
 import { useRouter } from "next/router";
 import { typeOptions } from "@/constants";
 import { useDeleteEvents } from "@/apis/use-delete-event";
@@ -82,6 +80,15 @@ export function DataTable({ data }: Props) {
       header: "Event Name",
       cell: ({ row }) => (
         <div className="capitalize">{row.getValue("eventName")}</div>
+      ),
+    },
+    {
+      accessorKey: "eventDescription",
+      header: "Event Description",
+      cell: ({ row }) => (
+        <div className="capitalize">
+          {row.getValue("eventDescription") ?? "-"}
+        </div>
       ),
     },
     {
@@ -145,11 +152,6 @@ export function DataTable({ data }: Props) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              {/* <DropdownMenuItem
-                      onClick={() => navigator.clipboard.writeText(payment.id)}
-                    >
-                      Copy payment ID
-                    </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
@@ -207,7 +209,6 @@ export function DataTable({ data }: Props) {
 
   const handleDeleteSelected = () => {
     const selectedRowIds = Object.keys(rowSelection);
-    // console.log("Deleting rows with IDs:", selectedRowIndexes);
     mutate(selectedRowIds, {
       onSuccess: () => {
         queryClient.invalidateQueries({
@@ -221,14 +222,6 @@ export function DataTable({ data }: Props) {
   return (
     <div className="w-full overflow-x-auto">
       <div className="flex items-center py-4">
-        {/* <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        /> */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -303,7 +296,6 @@ export function DataTable({ data }: Props) {
                 </TableCell>
               </TableRow>
             )}
-            {/* {Object.keys(rowSelection).length > 0 && ( */}
             <TableRow>
               <TableCell
                 colSpan={columns.length}
@@ -318,6 +310,7 @@ export function DataTable({ data }: Props) {
                   </div>
                 ) : (
                   <div
+                    className="cursor-pointer"
                     onClick={() => {
                       router.push(`add-event?date=${date}`);
                     }}
@@ -327,7 +320,6 @@ export function DataTable({ data }: Props) {
                 )}
               </TableCell>
             </TableRow>
-            {/* )} */}
           </TableBody>
         </Table>
       </div>

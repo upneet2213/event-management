@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components";
+import { endOfDay, startOfDay } from "date-fns";
 type EventCalendarProps = {
   events?: Array<Event>;
 };
@@ -53,17 +54,17 @@ function Calendar({
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
         head_cell:
-          "text-muted-foreground rounded-md w-9 md:w-20 lg:w-28 font-normal text-[0.8rem]",
+          "text-muted-foreground rounded-md w-11 md:w-[88px] lg:w-[120px] font-normal text-[0.8rem]",
         row: "flex w-full mt-2 gap-2",
         cell: "w-9 h-9 md:w-20 md:h-20 lg:w-28 lg:h-28 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "calendar" }),
-          "w-9 h-9 md:h-20 md:w-20 lg:h-28 lg:w-28 p-0 font-normal aria-selected:opacity-100"
+          "w-9 h-9 md:h-20 md:w-20 lg:h-28 lg:w-28 relative z-10 p-0 font-normal aria-selected:opacity-100 border text-orange-700"
         ),
         day_range_end: "day-range-end",
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-orange-300 text-accent-foreground",
+        day_today: "bg-gray-100 text-accent-foreground",
         day_outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
         day_disabled: "text-muted-foreground opacity-50",
@@ -91,7 +92,7 @@ function Calendar({
                 handleChange(value);
               }}
             >
-              <SelectTrigger className="pr-1.5 focus:ring-0">
+              <SelectTrigger className="pr-1.5">
                 <SelectValue>{selected?.props?.children}</SelectValue>
               </SelectTrigger>
               <SelectContent position="popper">
@@ -113,12 +114,15 @@ function Calendar({
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
         Day: ({ ...dayProps }) => {
           const eventsOnDay = events?.filter((currEvent) => {
-            const eventFromDate = new Date(currEvent.eventFrom);
-            const eventToDate = new Date(currEvent.eventTo);
+            const eventFromDate = new Date(currEvent.eventFrom); // Ensure correct conversion
+            const eventToDate = new Date(currEvent.eventTo); //
+
+            const dayStart = startOfDay(dayProps.date).valueOf();
+            const dayEnd = endOfDay(dayProps.date).valueOf();
 
             return (
-              eventFromDate.valueOf() <= dayProps.date.valueOf() &&
-              eventToDate.valueOf() >= dayProps.date.valueOf()
+              eventFromDate.valueOf() <= dayEnd &&
+              eventToDate.valueOf() >= dayStart
             );
           });
 

@@ -8,7 +8,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "PUT") {
-    const { id, eventName, eventType, eventFrom, eventTo } = req.body;
+    const { id, eventName, eventType, eventFrom, eventTo, eventDescription } =
+      req.body;
 
     if (!id) {
       return res.status(400).json({ error: "Event id is required" });
@@ -21,6 +22,7 @@ export default async function handler(
           eventName,
           eventTo,
           eventType,
+          eventDescription,
         },
       });
       res.status(200).json({

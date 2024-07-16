@@ -1,4 +1,4 @@
-import { CreateEvent } from "@/types";
+import { CreateEvent, Event } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 
 export const useAddEvent = () => {

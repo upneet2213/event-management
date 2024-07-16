@@ -13,6 +13,7 @@ datasource db {
 model Event {
   id  String  @id @default(cuid())
   eventName String
+  eventDescription String?
   eventType String
   eventFrom BigInt
   eventTo BigInt

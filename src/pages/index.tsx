@@ -49,7 +49,7 @@ export default function Home() {
 
   return (
     <main
-      className={`flex min-h-screen flex-col items-center p-24 ${inter.className}`}
+      className={`flex h-screen flex-col items-center p-24 pt-12 bg-orange-100 ${inter.className}`}
     >
       <div className="flex items-center gap-4">
         <Button
@@ -65,7 +65,7 @@ export default function Home() {
             setSelectedView(value);
           }}
         >
-          <SelectTrigger className="pr-1.5 focus:ring-0">
+          <SelectTrigger className="pr-1.5">
             <SelectValue></SelectValue>
           </SelectTrigger>
           <SelectContent position="popper">
@@ -117,12 +117,11 @@ export const getServerSideProps: GetServerSideProps<{
       queryKey: ["events", date],
       queryFn: () => getEventsByDate(date),
     });
-  } else {
-    await queryClient.prefetchQuery({
-      queryKey: ["events"],
-      queryFn: getEvents,
-    });
   }
+  await queryClient.prefetchQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+  });
 
   return {
     props: {

@@ -26,22 +26,28 @@ import { useQueryClient } from "@tanstack/react-query";
 import { typeOptions } from "@/constants";
 import { GetServerSideProps } from "next";
 
-const FormSchema = z.object({
-  eventName: z
-    .string({
-      required_error: "Please add a name",
-    })
-    .min(1),
-  eventType: z.string({
-    required_error: "Please add an event type",
-  }),
-  eventFrom: z.date({
-    required_error: "Please select a starting date",
-  }),
-  eventTo: z.date({
-    required_error: "Please select an end date",
-  }),
-});
+const FormSchema = z
+  .object({
+    eventName: z
+      .string({
+        required_error: "Please add a name",
+      })
+      .min(1),
+    eventDescription: z.string().nullable(),
+    eventType: z.string({
+      required_error: "Please add an event type",
+    }),
+    eventFrom: z.date({
+      required_error: "Please select a starting date",
+    }),
+    eventTo: z.date({
+      required_error: "Please select an end date",
+    }),
+  })
+  .refine((data) => data.eventFrom <= data.eventTo, {
+    message: "End date cannot be before start date",
+    path: ["eventTo"], // The path to the field that should show the error
+  });
 
 export default function AddEvent({ date }: { date: number }) {
   const router = useRouter();
@@ -74,7 +80,7 @@ export default function AddEvent({ date }: { date: number }) {
   };
 
   return (
-    <main className="min-h-screen p-24">
+    <main className="min-h-screen pt-12 p-24">
       <Form {...form}>
         <h1 className="text-4xl mb-12">Add Event</h1>
         <form
@@ -98,6 +104,25 @@ export default function AddEvent({ date }: { date: number }) {
           />
           <FormField
             control={form.control}
+            name="eventDescription"
+            render={({ field }) => {
+              return (
+                <FormItem className="w-full">
+                  <FormLabel>Event Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Event Description"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+          <FormField
+            control={form.control}
             name="eventType"
             render={({ field }) => {
               return (
@@ -108,7 +133,7 @@ export default function AddEvent({ date }: { date: number }) {
                     onValueChange={(value) => field.onChange(value)}
                   >
                     <FormControl>
-                      <SelectTrigger className="pr-1.5 focus:ring-0">
+                      <SelectTrigger className="pr-1.5">
                         <SelectValue placeholder="Select Event Type" />
                       </SelectTrigger>
                     </FormControl>

@@ -9,7 +9,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { eventName, eventType, eventFrom, eventTo } = req.body;
+    const { eventName, eventType, eventFrom, eventTo, eventDescription } =
+      req.body;
 
     try {
       const newEvent = await prisma.event.create({
@@ -18,6 +19,7 @@ export default async function handler(
           eventType,
           eventFrom,
           eventTo,
+          eventDescription,
         },
       });
       res.status(201).json({

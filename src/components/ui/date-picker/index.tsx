@@ -10,10 +10,18 @@ import { TimePicker } from "./time-picker";
 type Props = {
   date?: Date;
   className?: string;
+  minDate?: Date;
+  maxDate?: Date;
   onChangeDate: (date?: Date) => void;
 };
 
-export function DatePicker({ date, onChangeDate, className }: Props) {
+export function DatePicker({
+  date,
+  onChangeDate,
+  minDate,
+  maxDate,
+  className,
+}: Props) {
   const handleSelect = (newDay: Date | undefined) => {
     if (!newDay) return;
     if (!date) {
@@ -46,6 +54,8 @@ export function DatePicker({ date, onChangeDate, className }: Props) {
       <PopoverContent align="start" className=" w-auto p-0">
         <Calendar
           mode="single"
+          //   min={minDate?.valueOf()}
+          //   max={minDate?.valueOf()}
           captionLayout="dropdown-buttons"
           selected={date}
           onSelect={(d) => handleSelect(d)}

@@ -6,7 +6,9 @@ export const getEventsByDate: (date?: number) => Promise<Event[]> = async (
   date
 ) => {
   const res = await fetch(`${API_URLS["get-events-by-date"]}?date=${date}`);
-  return await res.json();
+  const data = await res.json();
+
+  return data;
 };
 
 export const useGetEventsByDate = (date?: number) => {

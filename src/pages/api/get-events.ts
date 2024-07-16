@@ -10,7 +10,11 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
-      const events = await prisma.event.findMany();
+      const events = await prisma.event.findMany({
+        orderBy: {
+          eventFrom: "asc",
+        },
+      });
       res.status(200).json(
         events.map((event) => {
           return {

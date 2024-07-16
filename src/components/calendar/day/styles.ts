@@ -1,13 +1,13 @@
 import { cva } from "class-variance-authority";
 
 export const dayVariants = cva(
-  `hidden md:block cursor-pointer rounded font-medium mb-2 relative`,
+  `hidden md:block cursor-pointer text-xs lg:text-sm font-medium rounded mb-2 relative whitespace-nowrap truncate px-2`,
   {
     variants: {
       eventType: {
-        "1": "bg-red-200 text-red-700",
-        "2": "bg-purple-200 text-purple-700",
-        "3": "bg-green-200 text-green-700",
+        "1": "bg-red-100 text-red-700",
+        "2": "bg-purple-100 text-purple-700",
+        "3": "bg-green-100 text-green-700",
       },
     },
   }
@@ -16,9 +16,9 @@ export const dayVariants = cva(
 export const dayContainerVariants = cva(`relative rounded`, {
   variants: {
     dayType: {
-      sunday: "bg-red-200",
-      eventDay: "bg-orange-300",
-      default: "bg-orange-200",
+      sunday: "bg-white",
+      eventDay: "bg-orange-200",
+      default: "bg-white",
     },
   },
 });

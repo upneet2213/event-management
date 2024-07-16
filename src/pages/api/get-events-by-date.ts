@@ -48,6 +48,9 @@ export default async function handler(
             },
           ],
         },
+        orderBy: {
+          eventFrom: "asc",
+        },
       });
 
       res.status(200).json(
