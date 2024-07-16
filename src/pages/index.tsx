@@ -49,9 +49,9 @@ export default function Home() {
 
   return (
     <main
-      className={`flex h-screen flex-col items-center p-24 pt-12 bg-orange-100 ${inter.className}`}
+      className={`flex h-screen flex-col items-center p-12 bg-orange-100 ${inter.className}`}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 mb-6">
         <Button
           onClick={() => {
             router.push("add-event");
@@ -88,7 +88,7 @@ export default function Home() {
           }}
         />
       ) : (
-        <DataTable data={events} />
+        <DataTable data={events ?? []} />
       )}
       {date && (
         <DaySheet

@@ -27,7 +27,7 @@ export function DaySheet({ events, open, setOpen }: Props) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent
-        className={`sm:max-w-none ${
+        className={`sm:max-w-none  overflow-y-auto ${
           isFullScreen ? "sm:w-11/12" : "sm:w-[600px]"
         } transition-all duration-200`}
       >

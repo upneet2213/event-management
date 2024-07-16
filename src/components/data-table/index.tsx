@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import {
   ColumnDef,
@@ -43,7 +41,7 @@ import { useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 
 type Props = {
-  data: any;
+  data: Event[];
 };
 
 export function DataTable({ data }: Props) {
@@ -116,7 +114,15 @@ export function DataTable({ data }: Props) {
     },
     {
       accessorKey: "eventFrom",
-      header: () => <div className="text-center">From</div>,
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Event From
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const fromDate = new Date(row.getValue("eventFrom"));
 

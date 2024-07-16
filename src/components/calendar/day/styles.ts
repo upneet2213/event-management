@@ -5,7 +5,7 @@ export const dayVariants = cva(
   {
     variants: {
       eventType: {
-        "1": "bg-red-100 text-red-700",
+        "1": "bg-blue-100 text-blue-700",
         "2": "bg-purple-100 text-purple-700",
         "3": "bg-green-100 text-green-700",
       },
