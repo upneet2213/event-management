@@ -6,6 +6,6 @@ export function isSameDate(date1: Date, date2: Date) {
   );
 }
 
-export function getDateFormat(date: Date) {
-  return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
-}
+// export function getDateFormat(date: Date) {
+//   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+// }

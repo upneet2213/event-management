@@ -16,15 +16,22 @@ import {
   DatePicker,
 } from "@/components";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAddEvent } from "@/apis/use-add-event";
-import { useRouter } from "next/router";
-import { useQueryClient } from "@tanstack/react-query";
-import { typeOptions } from "@/constants";
+import {
+  dehydrate,
+  DehydratedState,
+  QueryClient,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { getEventById, useGetEventById } from "@/apis/use-get-event-by-id";
+import { useSearchParams } from "next/navigation";
 import { GetServerSideProps } from "next";
+import { useEditEvent } from "@/apis/use-edit-event";
+import { useRouter } from "next/router";
+import { typeOptions } from "@/constants";
 
 const FormSchema = z
   .object({
@@ -49,40 +56,60 @@ const FormSchema = z
     path: ["eventTo"], // The path to the field that should show the error
   });
 
-export default function AddEvent({ date }: { date: number }) {
-  const router = useRouter();
-
+export default function EditEvent() {
   const queryClient = useQueryClient();
-  const { mutate } = useAddEvent();
+  const { mutate } = useEditEvent();
+  const router = useRouter();
+  const params = useSearchParams();
+  const id = params.get("id");
+  const { data: event, isLoading } = useGetEventById(id ?? undefined);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      eventFrom: date ? new Date(date) : undefined,
-      eventTo: date ? new Date(date) : undefined,
+      ...event,
+      eventFrom: new Date(event?.eventFrom!),
+      eventTo: new Date(event?.eventTo!),
     },
   });
 
+  useEffect(() => {
+    if (!isLoading) {
+      form.reset({
+        ...event,
+        eventFrom: new Date(event?.eventFrom!),
+        eventTo: new Date(event?.eventTo!),
+      });
+    }
+  }, [form.reset, isLoading]);
+
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    const payload = {
-      ...data,
-      eventFrom: data.eventFrom.valueOf(),
-      eventTo: data.eventTo.valueOf(),
-    };
-    mutate(payload, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["events"],
-        });
-        router.back();
+    mutate(
+      {
+        ...data,
+        id: event?.id!,
+        eventFrom: data?.eventFrom.valueOf(),
+        eventTo: data?.eventTo.valueOf(),
       },
-    });
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            predicate(query) {
+              return (
+                query.queryKey[0] === "events" || query.queryKey[0] === "event"
+              );
+            },
+          });
+          router.back();
+        },
+      }
+    );
   };
 
   return (
     <main className="min-h-screen pt-12 p-24">
       <Form {...form}>
-        <h1 className="text-4xl mb-12">Add Event</h1>
+        <h1 className="text-4xl mb-12">Edit Event</h1>
         <form
           className={`flex flex-col items-center gap-12`}
           onSubmit={form.handleSubmit(onSubmit)}
@@ -108,7 +135,7 @@ export default function AddEvent({ date }: { date: number }) {
             render={({ field }) => {
               return (
                 <FormItem className="w-full">
-                  <FormLabel>Event Description</FormLabel>
+                  <FormLabel>Event Name</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Event Description"
@@ -200,13 +227,19 @@ export default function AddEvent({ date }: { date: number }) {
 }
 
 export const getServerSideProps: GetServerSideProps<{
-  date: number;
+  dehydratedState: DehydratedState;
 }> = async (ctx) => {
-  const date = parseInt(ctx.query.date as string);
+  const id = ctx.query.id as string;
+
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["event", id],
+    queryFn: () => getEventById(id),
+  });
 
   return {
     props: {
-      date,
+      dehydratedState: dehydrate(queryClient),
     },
   };
 };

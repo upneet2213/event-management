@@ -1,10 +1,13 @@
-type Event = {
-  id: string;
+interface CreateEvent {
   eventName: string;
   eventType: string;
-  //   eventDate: Date;
-  eventFrom: Date;
-  eventTo: Date;
-};
+  eventFrom: number;
+  eventTo: number;
+  eventDescription: string | null;
+}
 
-export { type Event };
+interface Event extends CreateEvent {
+  id: string;
+}
+
+export { type Event, type CreateEvent };

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Event } from "@/types";
 import React from "react";
-import { Day } from "react-day-picker";
+import { Day, DayClickEventHandler } from "react-day-picker";
 import { dayContainerVariants, dayVariants } from "./styles";
 
 type Props = {
@@ -33,10 +33,34 @@ const CustomDay: React.FC<Props> = ({ events, date, displayMonth }) => {
   return (
     <div className={cn(dayContainerVariants({ dayType }))}>
       <Day date={date} displayMonth={displayMonth} />
-      <div className="w-full flex gap-2 items-center justify-evenly absolute bottom-0 lg:bottom-2 left-0 px-2 overflow-auto hide-scrollbar">
-        {events?.map((event) => {
-          return <Tag key={event.id} event={event} />;
-        })}
+      {/* {events?.length && events?.length > 0 ? (
+        <div className="rounded-full w-6 h-6 absolute top-0 right-0">
+          <span>{events?.length}</span>
+        </div>
+      ) : null} */}
+      <div
+        className="items-center w-full absolute h-full top-6 left-1/2 -translate-x-1/2 px-1 overflow-hidden"
+        style={{
+          height: `calc(100% - 28px)`,
+        }}
+      >
+        {events?.map((event, index) => (
+          <Tag key={event.id} event={event} />
+        ))}
+        {/* {events && events?.length > 2 && (
+          <div className="hidden lg:block text-sm text-gray-500">
+            {events.length - 1} more
+          </div>
+        )} */}
+        {/* {events?.slice(0, 2).map((event, index) => (
+          <Tag key={event.id} event={event} />
+        ))} */}
+
+        {/* {events && events?.length > 1 && (
+          <div className="absolute hidden md:block lg:hidden text-sm text-gray-500">
+            {events?.length - 1} more
+          </div>
+        )} */}
       </div>
     </div>
   );

@@ -1,73 +1,131 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
-import { Calendar, Sheet } from "@/components";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import {
+  Button,
+  Calendar,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DaySheet } from "@/components/day-sheet";
+import {
+  dehydrate,
+  DehydratedState,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { getEvents, useGetEvents } from "@/apis/use-get-events";
+import {
+  getEventsByDate,
+  useGetEventsByDate,
+} from "@/apis/use-get-events-by-date";
+import { GetServerSideProps } from "next";
+import { Event } from "@/types";
+import { DataTable } from "@/components/data-table";
+import { useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const viewOptions = [
+  {
+    value: "calendar",
+    label: "Calendar View",
+  },
+  { value: "table", label: "Table View" },
+];
 
 export default function Home() {
   const params = useSearchParams();
   const router = useRouter();
 
   const date = params.get("date");
-
-  const event1Date = new Date(2024, 6, 12); // July 12, 2024
-  const event2Date = new Date(2024, 6, 13); // July 13, 2024
-  const event3Date = new Date(2024, 6, 14); // July 14, 2024
-  const event4Date = new Date(2024, 6, 15); // July 15, 2024
-
-  const events = [
-    {
-      id: "1",
-      eventName: "Event1",
-      eventType: "1",
-      eventFrom: event1Date,
-      eventTo: event2Date,
-    },
-    {
-      id: "2",
-      eventName: "Event2",
-      eventType: "2",
-      eventFrom: event2Date,
-      eventTo: event2Date,
-    },
-    {
-      id: "3",
-      eventName: "Event3",
-      eventType: "3",
-      eventFrom: event2Date,
-      eventTo: event4Date,
-    },
-  ];
+  const [selectedView, setSelectedView] = useState("calendar");
+  const { data: events } = useGetEvents();
+  const { data: eventsForDate } = useGetEventsByDate(
+    date ? parseInt(date) : undefined
+  );
 
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
+      className={`flex h-screen flex-col items-center p-24 pt-12 bg-orange-100 ${inter.className}`}
     >
-      <Calendar
-        events={events}
-        onDayClick={(props) => {
-          router.push(`?date=${props.valueOf()}`);
-        }}
-      />
-      <DaySheet
-        open={Boolean(date)}
-        setOpen={(isOpen) => {
-          if (!isOpen) {
-            router.replace("/");
-          }
-        }}
-      />
+      <div className="flex items-center gap-4">
+        <Button
+          onClick={() => {
+            router.push("add-event");
+          }}
+        >
+          Add Event
+        </Button>
+        <Select
+          value={selectedView}
+          onValueChange={(value) => {
+            setSelectedView(value);
+          }}
+        >
+          <SelectTrigger className="pr-1.5">
+            <SelectValue></SelectValue>
+          </SelectTrigger>
+          <SelectContent position="popper">
+            {viewOptions.map((option, id: number) => (
+              <SelectItem
+                key={`${option.value}-${id}`}
+                value={option.value ?? ""}
+              >
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      {selectedView === "calendar" ? (
+        <Calendar
+          events={events}
+          onDayClick={(props) => {
+            router.push(`?date=${props.valueOf()}`);
+          }}
+        />
+      ) : (
+        <DataTable data={events} />
+      )}
+      {date && (
+        <DaySheet
+          events={eventsForDate ?? []}
+          open={Boolean(date)}
+          setOpen={(isOpen) => {
+            if (!isOpen) {
+              router.replace("/");
+            }
+          }}
+        />
+      )}
     </main>
   );
 }
 
-// export async function getServerSideProps() {
-//   // Fetch data from external API
-//   // const res = await fetch(`https://.../data`)
-//   // const data = await res.json()
+export const getServerSideProps: GetServerSideProps<{
+  dehydratedState: DehydratedState;
+}> = async (ctx) => {
+  const date = parseInt(ctx.query.date as string);
 
-//   // Pass data to the page via props
-//   return { props: {} };
-// }
+  const queryClient = new QueryClient();
+
+  if (date) {
+    await queryClient.prefetchQuery({
+      queryKey: ["events", date],
+      queryFn: () => getEventsByDate(date),
+    });
+  }
+  await queryClient.prefetchQuery({
+    queryKey: ["events"],
+    queryFn: getEvents,
+  });
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+};
