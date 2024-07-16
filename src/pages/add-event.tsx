@@ -80,9 +80,9 @@ export default function AddEvent({ date }: { date: number }) {
   };
 
   return (
-    <main className="min-h-screen pt-12 p-24">
+    <main className="min-h-screen p-12">
       <Form {...form}>
-        <h1 className="text-4xl mb-12">Add Event</h1>
+        <h1 className="text-4xl mb-6">Add Event</h1>
         <form
           className={`flex flex-col items-center gap-12`}
           onSubmit={form.handleSubmit(onSubmit)}
