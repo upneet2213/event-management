@@ -2,9 +2,15 @@ type Event = {
   id: string;
   eventName: string;
   eventType: string;
-  //   eventDate: Date;
-  eventFrom: Date;
-  eventTo: Date;
+  eventFrom: number;
+  eventTo: number;
 };
 
-export { type Event };
+type CreateEvent = {
+  eventName: string;
+  eventType: string;
+  eventFrom: number;
+  eventTo: number;
+};
+
+export { type Event, type CreateEvent };

@@ -1,6 +1,5 @@
 import {
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -17,11 +16,15 @@ import {
   DatePicker,
 } from "@/components";
 
-import { Event } from "@/types";
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAddEvent } from "@/apis/use-add-event";
+import { useRouter } from "next/router";
+import { useQueryClient } from "@tanstack/react-query";
+import { typeOptions } from "@/constants";
+import { GetServerSideProps } from "next";
 
 const FormSchema = z.object({
   eventName: z
@@ -40,32 +43,35 @@ const FormSchema = z.object({
   }),
 });
 
-export default function AddEvent() {
+export default function AddEvent({ date }: { date: number }) {
+  const router = useRouter();
+
+  const queryClient = useQueryClient();
+  const { mutate } = useAddEvent();
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      eventName: "",
+      eventFrom: date ? new Date(date) : undefined,
+      eventTo: date ? new Date(date) : undefined,
     },
   });
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    // console.log(data);
+    const payload = {
+      ...data,
+      eventFrom: data.eventFrom.valueOf(),
+      eventTo: data.eventTo.valueOf(),
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["events"],
+        });
+        router.back();
+      },
+    });
   };
-
-  const typeOptions = [
-    {
-      value: "1",
-      label: "Personal",
-    },
-    {
-      value: "2",
-      label: "Professional",
-    },
-    {
-      value: "3",
-      label: "Miscellanous",
-    },
-  ];
 
   return (
     <main className="min-h-screen p-24">
@@ -167,3 +173,15 @@ export default function AddEvent() {
     </main>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<{
+  date: number;
+}> = async (ctx) => {
+  const date = parseInt(ctx.query.date as string);
+
+  return {
+    props: {
+      date,
+    },
+  };
+};

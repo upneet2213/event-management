@@ -1,6 +1,5 @@
 import {
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -17,11 +16,22 @@ import {
   DatePicker,
 } from "@/components";
 
-import { Event } from "@/types";
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  dehydrate,
+  DehydratedState,
+  QueryClient,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { getEventById, useGetEventById } from "@/apis/use-get-event-by-id";
+import { useSearchParams } from "next/navigation";
+import { GetServerSideProps } from "next";
+import { useEditEvent } from "@/apis/use-edit-event";
+import { useRouter } from "next/router";
+import { typeOptions } from "@/constants";
 
 const FormSchema = z.object({
   eventName: z
@@ -40,40 +50,55 @@ const FormSchema = z.object({
   }),
 });
 
-export default function AddEvent() {
-  const event1Date = new Date(2024, 6, 12); // July 12, 2024
-  const event2Date = new Date(2024, 6, 13); // July 13, 2024
-  const event: Event = {
-    eventFrom: event1Date,
-    eventTo: event2Date,
-    eventName: "My event",
-    eventType: "1",
-    id: "102",
-  };
+export default function EditEvent() {
+  const queryClient = useQueryClient();
+  const { mutate } = useEditEvent();
+  const router = useRouter();
+  const params = useSearchParams();
+  const id = params.get("id");
+  const { data: event, isLoading } = useGetEventById(id ?? undefined);
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: event,
+    defaultValues: {
+      ...event,
+      eventFrom: new Date(event?.eventFrom!),
+      eventTo: new Date(event?.eventTo!),
+    },
   });
-  const errors = form.formState.errors;
+
+  useEffect(() => {
+    if (!isLoading) {
+      form.reset({
+        ...event,
+        eventFrom: new Date(event?.eventFrom!),
+        eventTo: new Date(event?.eventTo!),
+      });
+    }
+  }, [form.reset, isLoading]);
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    // console.log(data);
+    mutate(
+      {
+        ...data,
+        id: event?.id!,
+        eventFrom: data?.eventFrom.valueOf(),
+        eventTo: data?.eventTo.valueOf(),
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            predicate(query) {
+              return (
+                query.queryKey[0] === "events" || query.queryKey[0] === "event"
+              );
+            },
+          });
+          router.back();
+        },
+      }
+    );
   };
-
-  const typeOptions = [
-    {
-      value: "1",
-      label: "Personal",
-    },
-    {
-      value: "2",
-      label: "Professional",
-    },
-    {
-      value: "3",
-      label: "Miscellanous",
-    },
-  ];
 
   return (
     <main className="min-h-screen p-24">
@@ -175,3 +200,21 @@ export default function AddEvent() {
     </main>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<{
+  dehydratedState: DehydratedState;
+}> = async (ctx) => {
+  const id = ctx.query.id as string;
+
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["event", id],
+    queryFn: () => getEventById(id),
+  });
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+};

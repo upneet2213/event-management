@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 export const dayVariants = cva(
-  `hidden md:block p-1 cursor-pointer rounded font-medium`,
+  `hidden md:block cursor-pointer rounded font-medium mb-2 relative`,
   {
     variants: {
       eventType: {

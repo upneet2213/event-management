@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Event } from "@/types";
 import React from "react";
-import { Day } from "react-day-picker";
+import { Day, DayClickEventHandler } from "react-day-picker";
 import { dayContainerVariants, dayVariants } from "./styles";
 
 type Props = {
@@ -33,7 +33,17 @@ const CustomDay: React.FC<Props> = ({ events, date, displayMonth }) => {
   return (
     <div className={cn(dayContainerVariants({ dayType }))}>
       <Day date={date} displayMonth={displayMonth} />
-      <div className="w-full flex gap-2 items-center justify-evenly absolute bottom-0 lg:bottom-2 left-0 px-2 overflow-auto hide-scrollbar">
+      {events?.length && events?.length > 0 ? (
+        <div className="bg-red-200 rounded-full w-6 h-6 absolute top-0 right-0">
+          <span>{events?.length}</span>
+        </div>
+      ) : null}
+      <div
+        className="items-center absolute top-4 left-1/2 -translate-x-1/2 px-2 overflow-auto hide-scrollbar"
+        style={{
+          height: `calc(100% - 32px)`,
+        }}
+      >
         {events?.map((event) => {
           return <Tag key={event.id} event={event} />;
         })}

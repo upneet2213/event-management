@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components";
 type EventCalendarProps = {
-  events: Array<Event>;
+  events?: Array<Event>;
 };
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker> &
@@ -111,19 +111,22 @@ function Calendar({
         },
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
-        Day: ({ ...props }) => {
+        Day: ({ ...dayProps }) => {
           const eventsOnDay = events?.filter((currEvent) => {
+            const eventFromDate = new Date(currEvent.eventFrom);
+            const eventToDate = new Date(currEvent.eventTo);
+
             return (
-              currEvent.eventFrom.valueOf() <= props.date.valueOf() &&
-              currEvent.eventTo.valueOf() >= props.date.valueOf()
+              eventFromDate.valueOf() <= dayProps.date.valueOf() &&
+              eventToDate.valueOf() >= dayProps.date.valueOf()
             );
           });
 
           return (
             <CustomDay
               events={eventsOnDay}
-              displayMonth={props.displayMonth}
-              date={props.date}
+              displayMonth={dayProps.displayMonth}
+              date={dayProps.date}
             />
           );
         },
