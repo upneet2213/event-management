@@ -8,7 +8,7 @@ import {
   getArrowByType,
   getDateByType,
   setDateByType,
-} from "../time-picker-utils";
+} from "./time-picker-utils";
 
 export interface TimePickerInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

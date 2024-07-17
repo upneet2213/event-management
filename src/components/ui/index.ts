@@ -1,4 +1,3 @@
-export { Calendar } from "../calendar";
 export { Button } from "./button";
 export * from "./sheet";
 export * from "./table";
