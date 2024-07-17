@@ -26,6 +26,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { typeOptions } from "@/constants";
 import { GetServerSideProps } from "next";
 
+//create zod schema to parse our form before submission
 const FormSchema = z
   .object({
     eventName: z
@@ -58,6 +59,10 @@ export default function AddEvent({ date }: { date: number }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
+      //if we don't make it null by default, we get required error. Need to check why.
+      eventDescription: null,
+      eventName: "",
+      eventType: "",
       eventFrom: date ? new Date(date) : undefined,
       eventTo: date ? new Date(date) : undefined,
     },
@@ -72,6 +77,7 @@ export default function AddEvent({ date }: { date: number }) {
     mutate(payload, {
       onSuccess: () => {
         queryClient.invalidateQueries({
+          //invalidate and refetch events on adding a new event
           queryKey: ["events"],
         });
         router.back();

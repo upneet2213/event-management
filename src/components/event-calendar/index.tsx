@@ -38,6 +38,7 @@ function EventCalendar({
       fromYear={1960}
       toYear={2030}
       className={cn("p-3", className)}
+      //classnames for styling the calendar
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -64,7 +65,8 @@ function EventCalendar({
         day_range_end: "day-range-end",
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-gray-100 text-accent-foreground",
+        day_today:
+          "text-accent-foreground underline decoration-2 underline-offset-2",
         day_outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
         day_disabled: "text-muted-foreground opacity-50",
@@ -74,6 +76,7 @@ function EventCalendar({
         ...classNames,
       }}
       components={{
+        //custom rendering month and year selection dropdowns to match the design
         Dropdown: ({ value, onChange, children, ...props }: DropdownProps) => {
           const options = React.Children.toArray(
             children
@@ -114,6 +117,7 @@ function EventCalendar({
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
         Day: ({ ...dayProps }) => {
           const eventsOnDay = events?.filter((currEvent) => {
+            //logic to check all events on a day to display tags and other relevant information
             const eventFromDate = new Date(currEvent.eventFrom); // Ensure correct conversion
             const eventToDate = new Date(currEvent.eventTo); //
 

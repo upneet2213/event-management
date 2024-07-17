@@ -16,7 +16,7 @@ import {
   DatePicker,
 } from "@/components";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,6 +33,7 @@ import { useEditEvent } from "@/apis/use-edit-event";
 import { useRouter } from "next/router";
 import { typeOptions } from "@/constants";
 
+//create zod schema to parse our form before submission
 const FormSchema = z
   .object({
     eventName: z
@@ -62,26 +63,20 @@ export default function EditEvent() {
   const router = useRouter();
   const params = useSearchParams();
   const id = params.get("id");
+  //we can pass id as undefined because if undefined, the api won't be called due to react query's enabled field
   const { data: event, isLoading } = useGetEventById(id ?? undefined);
 
+  //create a form using react hook form to manage accessibility and errors and make form easier
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    //since we get the data in getServerSideProps, it's already available when client side renders
+    //this, default value can be assigned directly
     defaultValues: {
       ...event,
       eventFrom: new Date(event?.eventFrom!),
       eventTo: new Date(event?.eventTo!),
     },
   });
-
-  useEffect(() => {
-    if (!isLoading) {
-      form.reset({
-        ...event,
-        eventFrom: new Date(event?.eventFrom!),
-        eventTo: new Date(event?.eventTo!),
-      });
-    }
-  }, [form.reset, isLoading]);
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     mutate(
@@ -96,6 +91,7 @@ export default function EditEvent() {
           queryClient.invalidateQueries({
             predicate(query) {
               return (
+                //after the mutation is complete, we want to refetch events and specific events
                 query.queryKey[0] === "events" || query.queryKey[0] === "event"
               );
             },
