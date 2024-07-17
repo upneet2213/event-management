@@ -47,10 +47,11 @@ type Props = {
 
 export function DataTable({ data }: Props) {
   const queryClient = useQueryClient();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const date = searchParams.get("date");
   const { mutate } = useDeleteEvents();
+
+  //creating columns in the table itself so that it's easier to reuse. can change in the future
   const columns: ColumnDef<Event>[] = [
     {
       id: "select",
@@ -304,6 +305,7 @@ export function DataTable({ data }: Props) {
                 colSpan={columns.length}
                 className="text-center p-0 h-12"
               >
+                {/* if no events are selected, show option to add new event, otherwise, show option to delete selected events */}
                 {Object.keys(rowSelection).length > 0 ? (
                   <div
                     className="bg-red-600 text-white h-full w-full cursor-pointer flex items-center justify-center"

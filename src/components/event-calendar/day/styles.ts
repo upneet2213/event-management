@@ -16,7 +16,6 @@ export const dayVariants = cva(
 export const dayContainerVariants = cva(`relative rounded`, {
   variants: {
     dayType: {
-      // sunday: "bg-white",
       eventDay: "bg-orange-200",
       default: "bg-white",
     },
