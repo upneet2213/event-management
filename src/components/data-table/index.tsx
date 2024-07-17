@@ -39,6 +39,7 @@ import { useDeleteEvents } from "@/apis/use-delete-event";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { format } from "date-fns";
+import Link from "next/link";
 
 type Props = {
   data: Event[];
@@ -159,13 +160,9 @@ export function DataTable({ data }: Props) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  router.push(`/edit-event/?id=${event.id}`);
-                }}
-              >
-                Edit
-              </DropdownMenuItem>
+              <Link href={`/edit-event/?id=${event.id}`}>
+                <DropdownMenuItem>Edit</DropdownMenuItem>
+              </Link>
               <DropdownMenuItem
                 onClick={() => {
                   mutate([event.id], {
@@ -315,14 +312,9 @@ export function DataTable({ data }: Props) {
                     Delete Selected Rows
                   </div>
                 ) : (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => {
-                      router.push(`add-event?date=${date}`);
-                    }}
-                  >
-                    Add Event
-                  </div>
+                  <Link href={date ? `add-event?date=${date}` : "add-event"}>
+                    <div className="cursor-pointer">Add Event</div>
+                  </Link>
                 )}
               </TableCell>
             </TableRow>

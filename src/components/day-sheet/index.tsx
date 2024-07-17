@@ -8,7 +8,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Expand, Shrink } from "lucide-react";
-import { DataTable } from "@/components/data-table";
+import { DataTable } from "@/components";
 import { Event } from "@/types";
 import { format } from "date-fns";
 

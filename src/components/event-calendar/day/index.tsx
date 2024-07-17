@@ -23,12 +23,8 @@ const Tag = ({ event }: { event: Event }) => {
 };
 
 const CustomDay: React.FC<Props> = ({ events, date, displayMonth }) => {
-  const isSunday = date.getDay() === 0;
-  const dayType = isSunday
-    ? "sunday"
-    : events && events?.length > 0
-    ? "eventDay"
-    : "default";
+  //change later
+  const dayType = events && events?.length > 0 ? "eventDay" : "default";
 
   return (
     <div className={cn(dayContainerVariants({ dayType }))}>
@@ -39,28 +35,14 @@ const CustomDay: React.FC<Props> = ({ events, date, displayMonth }) => {
         </div>
       ) : null}
       <div
-        className="items-center w-full absolute h-full top-6 left-1/2 -translate-x-1/2 px-1 overflow-hidden"
+        className="items-center w-full absolute h-full top-7 left-1/2 -translate-x-1/2 px-1 overflow-hidden"
         style={{
-          height: `calc(100% - 28px)`,
+          height: `calc(100% - 42px)`,
         }}
       >
-        {events?.map((event, index) => (
+        {events?.map((event) => (
           <Tag key={event.id} event={event} />
         ))}
-        {/* {events && events?.length > 2 && (
-          <div className="hidden lg:block text-sm text-gray-500">
-            {events.length - 1} more
-          </div>
-        )} */}
-        {/* {events?.slice(0, 2).map((event, index) => (
-          <Tag key={event.id} event={event} />
-        ))} */}
-
-        {/* {events && events?.length > 1 && (
-          <div className="absolute hidden md:block lg:hidden text-sm text-gray-500">
-            {events?.length - 1} more
-          </div>
-        )} */}
       </div>
     </div>
   );

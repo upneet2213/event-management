@@ -24,7 +24,7 @@ type EventCalendarProps = {
 export type CalendarProps = React.ComponentProps<typeof DayPicker> &
   EventCalendarProps;
 
-function Calendar({
+function EventCalendar({
   events,
   className,
   classNames,
@@ -59,7 +59,7 @@ function Calendar({
         cell: "w-9 h-9 md:w-20 md:h-20 lg:w-28 lg:h-28 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "calendar" }),
-          "w-9 h-9 md:h-20 md:w-20 lg:h-28 lg:w-28 relative z-10 p-0 font-normal aria-selected:opacity-100 border text-orange-700"
+          "w-9 h-9 md:h-20 md:w-20 lg:h-28 lg:w-28 relative z-10 p-1 font-normal aria-selected:opacity-100 border text-orange-700"
         ),
         day_range_end: "day-range-end",
         day_selected:
@@ -139,6 +139,6 @@ function Calendar({
     />
   );
 }
-Calendar.displayName = "Calendar";
+EventCalendar.displayName = "EventCalendar";
 
-export { Calendar };
+export { EventCalendar };

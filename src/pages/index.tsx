@@ -1,30 +1,25 @@
 import { Inter } from "next/font/google";
 import {
   Button,
-  Calendar,
+  EventCalendar,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  DataTable,
+  DaySheet,
 } from "@/components";
 import { useRouter, useSearchParams } from "next/navigation";
-import { DaySheet } from "@/components/day-sheet";
-import {
-  dehydrate,
-  DehydratedState,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
+import { dehydrate, DehydratedState, QueryClient } from "@tanstack/react-query";
 import { getEvents, useGetEvents } from "@/apis/use-get-events";
 import {
   getEventsByDate,
   useGetEventsByDate,
 } from "@/apis/use-get-events-by-date";
 import { GetServerSideProps } from "next";
-import { Event } from "@/types";
-import { DataTable } from "@/components/data-table";
 import { useState } from "react";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -52,13 +47,9 @@ export default function Home() {
       className={`flex h-screen flex-col items-center p-12 bg-orange-100 ${inter.className}`}
     >
       <div className="flex items-center gap-4 mb-6">
-        <Button
-          onClick={() => {
-            router.push("add-event");
-          }}
-        >
-          Add Event
-        </Button>
+        <Link href="add-event">
+          <Button>Add Event</Button>
+        </Link>
         <Select
           value={selectedView}
           onValueChange={(value) => {
@@ -81,7 +72,7 @@ export default function Home() {
         </Select>
       </div>
       {selectedView === "calendar" ? (
-        <Calendar
+        <EventCalendar
           events={events}
           onDayClick={(props) => {
             router.push(`?date=${props.valueOf()}`);
