@@ -1,3 +1,4 @@
+import { Toaster } from "@/components";
 import "@/styles/globals.css";
 import {
   HydrationBoundary,
@@ -27,6 +28,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <HydrationBoundary state={pageProps.dehydratedState}>
         {/* <ReactQueryDevtools initialIsOpen={true} /> */}
         <Component {...pageProps} />
+        <Toaster />
       </HydrationBoundary>
     </QueryClientProvider>
   );

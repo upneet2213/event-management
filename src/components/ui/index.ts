@@ -10,3 +10,4 @@ export { Label } from "./label";
 export * from "./form";
 export * from "./popover";
 export * from "./date-picker";
+export * from "./toast";

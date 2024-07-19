@@ -9,6 +9,8 @@ import {
   SelectValue,
   DataTable,
   DaySheet,
+  Input,
+  useToast,
 } from "@/components";
 import { useRouter, useSearchParams } from "next/navigation";
 import { dehydrate, DehydratedState, QueryClient } from "@tanstack/react-query";
@@ -18,8 +20,9 @@ import {
   useGetEventsByDate,
 } from "@/apis/use-get-events-by-date";
 import { GetServerSideProps } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { format } from "date-fns";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +37,7 @@ const viewOptions = [
 export default function Home() {
   const params = useSearchParams();
   const router = useRouter();
+  const { toast } = useToast();
 
   //this route renders the calendar/table and the day sheet
   //if there is a date query param, we show the sheet
@@ -41,6 +45,7 @@ export default function Home() {
   //this approach of saving state in url is more manageable and future proof than saving it in usestate
   const date = params.get("date");
   const [selectedView, setSelectedView] = useState("calendar");
+  const [searchValue, setSearchValue] = useState("");
 
   //here, we get the data to be passed to our components through use query.
 
@@ -50,6 +55,44 @@ export default function Home() {
   const { data: eventsForDate } = useGetEventsByDate(
     date ? parseInt(date) : undefined
   );
+
+  const searchResult = events?.filter((event) => {
+    const eventName = event.eventName.toLowerCase();
+    const eventDescription = event.eventDescription?.toLowerCase() ?? "";
+    const searchQuery = searchValue.toLowerCase();
+    return (
+      eventName.indexOf(searchQuery) !== -1 ||
+      (eventDescription && eventDescription.indexOf(searchQuery) !== -1)
+    );
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const timeStampNow = new Date().valueOf();
+      const tenSecondsDate = new Date();
+      const tenSecondsStamp = new Date(
+        tenSecondsDate.getTime() + 10 * 1000
+      ).valueOf();
+
+      const eventsHappening = events?.filter((event) => {
+        return (
+          format(timeStampNow, "PPP HH mm ss") ===
+          format(event.eventFrom, "PPP HH mm ss")
+        );
+      });
+
+      eventsHappening?.forEach((event) => {
+        toast({
+          title: event.eventName,
+          description: "Event happening now",
+        });
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [events]);
 
   return (
     <main
@@ -89,7 +132,14 @@ export default function Home() {
           }}
         />
       ) : (
-        <DataTable data={events ?? []} />
+        <>
+          <Input
+            value={searchValue}
+            placeholder="Search events"
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+          <DataTable data={searchResult ?? []} />
+        </>
       )}
       {/* only render sheet if there is no date query param, remove date query param on closing sheet */}
       {date && (
